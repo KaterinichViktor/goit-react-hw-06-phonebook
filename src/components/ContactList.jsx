@@ -1,22 +1,26 @@
-
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteContact } from '../Redux/contactsSlice';
 
 const ContactList = () => {
   const contacts = useSelector((state) => state.contacts.contacts);
+  const filter = useSelector((state) => state.contacts.filter);
   const dispatch = useDispatch();
 
-  const handleDeleteContact = (contactId) => {
-    dispatch(deleteContact(contactId));
-  };
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <ul>
-      {contacts.map((contact) => (
+      {filteredContacts.map((contact) => (
         <li key={contact.id}>
           {contact.name}: {contact.number}
-          <button onClick={() => handleDeleteContact(contact.id)}>Delete</button>
+          <button
+            onClick={() => dispatch(deleteContact(contact.id))} // Використовуємо dispatch без окремої функції handleDeleteContact
+          >
+            Delete
+          </button>
         </li>
       ))}
     </ul>
