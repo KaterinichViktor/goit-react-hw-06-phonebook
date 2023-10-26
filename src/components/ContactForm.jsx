@@ -1,53 +1,68 @@
-// ContactForm.js
-import React, { Component } from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../Redux/contactsSlice';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+const ContactForm = () => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  handleInputChange = (e) => {
+  const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.contacts.contacts);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    this.setState({ [name]: value });
+    if (name === 'name') {
+      setName(value);
+    } else if (name === 'number') {
+      setNumber(value);
+    }
   };
 
-  handleAddContact = () => {
-    const { name, number } = this.state;
+  const handleAddContact = () => {
     if (name === '' || number === '') {
       alert('Please fill in all fields');
       return;
     }
-
-    this.props.onAddContact({ name, number });
-    this.setState({ name: '', number: '' });
+  
+    const newContact = {
+      name,
+      number,
+      id: Date.now(),
+    };
+  
+    if (contacts.find((contact) => contact.name === name)) {
+      alert(`${name} is already in contacts.`);
+      return;
+    }
+  
+    dispatch(addContact(newContact));
+    setName('');
+    setNumber('');
   };
-
-  render() {
-    return (
-      <div>
-        <form>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={this.state.name}
-            onChange={this.handleInputChange}
-          />
-          <input
-            type="tel"
-            name="number"
-            placeholder="Phone Number"
-            value={this.state.number}
-            onChange={this.handleInputChange}
-          />
-          <button type="button" onClick={this.handleAddContact}>
-            Add Contact
-          </button>
-        </form>
-      </div>
-    );
-  }
-}
+  
+  return (
+    <div>
+      <form>
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={name}
+          onChange={handleInputChange}
+        />
+        <input
+          type="tel"
+          name="number"
+          placeholder="Phone Number"
+          value={number}
+          onChange={handleInputChange}
+        />
+        <button type="button" onClick={handleAddContact}>
+          Add Contact
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default ContactForm;
